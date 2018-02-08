@@ -1,0 +1,292 @@
+---
+title: "Introduction to R"
+author: "Abdirisak Mohamed"
+date: "Spring 2018"
+output:
+  html_document:
+    toc: yes
+    toc_depth: '2'
+  pdf_document:
+    keep_tex: yes
+    toc: yes
+    toc_depth: 2
+geometry: right=2.5in
+---
+
+```{r cache=FALSE, echo=FALSE}
+library(knitr)
+opts_chunk$set(fig.align="center", fig.height=5.5, fig.width=6, collapse=TRUE, comment="", prompt=TRUE)
+options(width=63)
+```
+
+
+# Basics of R
+
+RStudio is an integrated development environment for R. One of the advantages of R is that you can start off as a user. It has an interactive console where you can enter commands. It is similar to a calculator.
+
+## Arithmetic
+```{r}
+4 + 5
+```
+
+```{r}
+ 1 + 2*3 - 4^2
+```
+
+```{r}
+ 1 + (2*3) - (4^2)
+```
+
+## R Objects
+
+R has five atomic (basic) classes of objects:
+
+* Character
+* Numeric (real numbers)
+* Integer
+* Complex
+* Logic (TRUE/FALSE)
+
+## Examples (the <- is the assignment operator)
+```{r}
+name<-"Rockville"
+x<-sqrt(2)
+n<-8L
+z<-3 + 4i
+statement<-FALSE
+```
+
+The # character signals the start of  a comment.  # and everything after it  are not evaluated
+
+```{r}
+y<-9 # not evaluated
+```
+
+We used the function sqrt() above. It is one of many built-in functions in R.
+
+[Built-In Functions](http://www.statmethods.net/management/functions.html)
+
+## Print. You can either auto-print or use the function print()
+```{r}
+y
+print(y)
+```
+
+## Integer sequence
+```{r}
+z<-1:10
+z
+x <- seq(from=0, to=10, by=2)
+x
+length(x)
+```
+
+## Vectors: The most basic object
+
+A vector can only contain elements of the same class
+```{r}
+w<-c("name", "age", "gender")
+x<-c("TRUE", "FALSE")
+y<-c(1.5, 2.7)
+z<-1:10
+
+```
+
+The function vector() creates a vector
+```{r}
+x<-vector("numeric", length = 4)
+x
+```
+
+Index of a vector starts at 1 not 0
+```{r}
+x<-c(7,8,9)
+x[1]
+x[0] # numeric vector of length zero (i.e., empty)
+```
+
+## Implicit Coersion:
+If you put elements of different classes in a vector, R coerces them into one class
+```{r}
+x <- c(2.9, "b")   ## character 
+class(x)
+y <- c(5, FALSE)    ## numeric 
+class(y)
+z <- c("b", TRUE)  ## character
+class(z)
+
+```
+
+## Explicit Coersion
+You can be explicitly coerce a vector from one class to another using exisitng as.* functions
+```{r}
+x <- 1:3  
+x
+class(x) 
+as.numeric(x) 
+as.logical(x)  # 0 = FALSE, other integers = TRUE
+as.character(x)
+
+# You get NAs as the conversion is not supported
+y <- c("a", "b", "c") 
+y
+as.numeric(y) 
+as.logical(y) 
+
+# Logical to numeric
+z<-c(TRUE, FALSE, TRUE)
+z
+as.numeric(z)
+as.character(z)
+```
+
+## Matrices
+Matrices are vectors with  dimensions. The dimension attribute is a vector v = c(nrow, ncol) of integers. Like vecors, matrices contain elements of the same class.
+```{r}
+my_mat <- matrix(nrow = 3, ncol = 4) 
+my_mat    
+dim(my_mat)  
+attributes(my_mat) 
+```
+
+Matrices are filled column-wise. You can change it by setting byrow = TRUE.
+```{r}
+mat_2<- matrix(1:6, nrow = 2, ncol = 3) 
+mat_2
+
+# Fill by rows
+mat_3<- matrix(1:6, nrow = 2, ncol = 3, byrow = TRUE) 
+mat_3
+```
+
+Adding a dimension attribute to a vector makes it a matrix
+```{r}
+x<-1:6
+x
+dim(x)<-c(2,3)
+x
+```
+
+# Column-binding and Row-binding 
+```{r}
+x<-1:6
+x
+y<-11:16
+y
+c_mat<-cbind(x,y)
+c_mat
+r_mat<-rbind(x,y)
+r_mat
+```
+
+## Lists
+Lists are like vectors but they can contain elements of different classes
+```{r}
+x <- list(1:6, c("name","gender", "age"), FALSE) 
+x
+```
+
+Accessing elements of a list
+```{r}
+x[[3]]
+x[[2]][3]
+x[[1]][5]
+```
+
+# Factors
+Factors represent categorical variables
+```{r}
+x <- factor(c("January", "April", "January", "June", "April", "April"))
+x
+table(x)
+unclass(x)
+# You can set the order of the levels
+y <- factor(c("January", "April", "January", "June", "April", "April"), 
+            levels = c("January", "April", "June"))
+y
+```
+
+## Missing Values
+
+NA stands for Not Available and  NaN stands for Not a Number.
+
+The function is.na() is used to test if an element or object is NA.
+
+Similarly, is.nan() is  for testing NaN.
+
+NA values have a class,e.g.,  integer NA, character NA. 
+
+Every NaN value is also NA value but the converse does not hold
+
+```{r}
+ x<-c(3, 5, NA, "a", TRUE) 
+is.na(x) 
+is.nan(x) 
+y<-c(3, 5, NA, "a", NaN) 
+is.na(y) 
+is.nan(y) 
+
+```
+
+##Data Frames 
+Data Frames contain data in tabular form.
+
+Data Frames are a special type of list; every member  of the list has  the same length.
+
+The columns are the members of the list.
+
+Data frames can (in contrast to matrices) contain different classes of objects
+
+Data frames have the attribute  row.names
+
+If you want to read a file as a data frame, use read.table() or read.csv().
+
+Data Frames can be converted to a matrix by the function data.matrix() 
+
+```{r}
+df <- data.frame( age = c(20,30,25, 23), 
+                  class = c("Freshman", "Senior" , "Junior", "Sophomore") )
+df
+nrow(df) 
+ncol(df) 
+```
+
+## Names
+
+Vectors can have names
+```{r}
+vec<-c(25, 5.5, 150)
+vec
+names(vec)
+names(vec)<-c("age", "height", "weight")
+vec
+names(vec)
+
+```
+
+Lists with names
+```{r}
+z<-list(age = c(20,30,25, 23), class = c("Freshman", "Senior" , "Junior", "Sophomore"))
+z
+```
+
+Accessing a list by names
+```{r}
+z$age
+z$class
+```
+
+Matrices with names
+```{r}
+my_mat <- matrix(1:6, nrow = 2, ncol = 3) 
+dimnames(my_mat) <- list(c("a", "b"), c("c", "d", "e")) 
+my_mat
+```
+
+Accessing names
+```{r}
+names(df)
+colnames(df)
+rownames(df)
+row.names(df)
+```
