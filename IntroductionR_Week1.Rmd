@@ -191,6 +191,7 @@ Accessing elements of a list
 x[[3]]
 x[[2]][3]
 x[[1]][5]
+
 ```
 
 # Factors

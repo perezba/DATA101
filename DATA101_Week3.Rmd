@@ -1,0 +1,640 @@
+---
+title: "DATA101 Week3"
+author: "Abdirisak Mohamed"
+date: "Spring 2018"
+output:
+  html_document:
+    toc: yes
+    toc_depth: '2'
+  pdf_document:
+    keep_tex: yes
+    toc: yes
+    toc_depth: 2
+geometry: right=2.5in
+---
+
+```{r cache=FALSE, echo=FALSE}
+library(knitr)
+opts_chunk$set(fig.align="center", fig.height=5.5, fig.width=6, collapse=TRUE, comment="", prompt=TRUE)
+options(width=63)
+```
+
+
+# Functions
+
+From the book **R Programming for Data Science** 
+   
+- Writing functions is a core activity of an R programmer. It represents the key step of the        transition from a mere “user” to a developer who creates new functionality for R. 
+
+- Functions are often used to encapsulate a sequence of expressions that need to be executed         numerous times, perhaps under slightly different conditions. 
+
+- Functions are also often written when code must be shared with others or the public.
+   
+
+## Functions in R
+
+-Functions are defined using the function() directive and are stored as R objects
+
+-Functions can be passed as arguments to other functions. This is very handy for the various
+apply funtions, like lapply() and sapply().
+
+-Functions can be nested, so that you can define a function inside of another function
+
+## Examples
+```{r}
+increment <- function(x) {
+  x<-x +1
+  x
+}
+
+increment(x=5)
+
+increment(5)
+
+new_increment <- increment
+new_increment(x=5)
+```
+
+Another example
+```{r}
+increment_1 <- function(x) {
+  y <- x + 1
+  return(list(x_original=x, x_increment=y))
+}
+
+increment_1(x=5)
+
+z <- increment_1(x=5)
+
+```
+
+
+Default function arguments
+```{r}
+expon_1 <- function(x, y, exponent) {
+  if(exponent == 2) {
+                      x^y }
+              else {
+      
+                    y^x }
+}
+  
+expon_1(x=2, y=3, exponent = 2 )
+
+expon_1(x=2, y=3, exponent = 1 )
+
+# Now we make the argument exponent default with exponent = 2
+
+expon_new <- function(x, y, exponent = 2) {
+  if(exponent == 2) {
+                      x^y }
+              else {
+      
+                    y^x }
+}
+  
+expon_new(x=2, y=3)
+
+expon_new(x=2, y=3, exponent = 1 )
+
+```
+
+## The ... Argument
+
+- The ... argument indicates a variable number of arguments that are usually passed on to other    functions
+
+```{r}
+myplot <- function(x, y, type = "l", ...) {
+plot(x, y, type = type, ...) ## Pass '...' to 'plot' function
+}
+```
+
+## After the ... Argument
+
+- Any arguments that appear after ... on the argument list must be named
+  explicitly and cannot be partially matched (e.g, se instead of sep ) or matched positionally if   the default values are not going to be used.
+  
+- Fro example, paste() doesn't know in advance how many character vectors
+  will be passed to the function by the user. So the first argument to the function is ....
+
+
+```{r}
+args(paste)
+
+paste("a", "b", sep = ":")
+
+paste("a", "b", se = ":") # partial sep 
+```
+
+## Coding Standards for R
+
+- Always use text files / text editor: RStudio instead of Microsoft Word
+
+- Indent your code
+
+- Limit the width of your code
+
+- Limit the length of individual functions
+
+- Comment your code
+
+## Binary Formats for Storing Data
+
+- RData file is a binary file for saving R objects
+
+Create 'a' and 'b' 
+```{r}
+a <- data.frame(x = rnorm(100), y = runif(100))
+b <- c(3, 4.4, 1 / 3)
+```
+
+Save 'a' and 'b' to a file and remove from your environment (workspace)
+```{r}
+save(a, b, file = "mydata.rda")
+
+rm(a,b) # rm(list=ls()) for removing everything
+
+```
+
+Load 'a' and 'b' into your environment
+```{r}
+
+load("mydata.rda")
+b
+
+```
+
+
+
+# Subsetting R Objects
+
+- There are three operators that can be used to extract subsets of R objects.
+
+    -The [ operator always returns an object of the same class as the original. It can be used to
+      select multiple elements of an object
+      
+    -The [[ operator is used to extract elements of a list or a data frame. It can only be used        to extract a single element and the class of the returned object will not necessarily be a       list or data frame.
+    
+    -The $ operator is used to extract elements of a list or data frame by literal name. Its           semantics are similar to that of [[.
+
+
+## Subsetting Vectors
+
+```{r}
+x <- c("name", "height", "weight")
+
+x[1]           #  first element
+x[2]           #  second element
+
+x[1:2]         # first and second
+
+x[c(1, 3)]  # first and third
+x[-c(1, 3)] #  all elements EXCEPT first and third
+```
+
+Using logical vectors for subsetting
+
+```{r}
+x > "name"
+
+x[x > "name"]
+
+y<-x[x != "name"]
+
+y
+
+```
+
+## Subsettng Matrices
+
+```{r}
+x <- matrix(1:6, 2, 3)
+x
+
+x[1,2]
+x[2,1]
+x[1, ]  ## Extract the first row 
+x[ ,2]  ## Extract the second column 
+
+```
+
+
+
+```{r}
+colnames(x) <- c("age", "height", "weight")
+
+x
+```
+
+```{r}
+x[ , c("height", "weight")]
+
+x[c(FALSE, TRUE), c("height", "weight")]
+
+x[2, c("height", "weight")]
+
+
+```
+
+## Subsettng Matrices
+
+```{r}
+odd <- (x %% 2) == 1
+
+odd
+
+x[odd]
+
+x[c(3, 5, 1)]
+```
+
+
+## Subsetting Lists
+
+```{r}
+
+x <- list(measures = 1:3, cities=c("Rockville", "Gaithersburg", "Germantown"), 
+          statement=c(FALSE, TRUE, NA))
+
+x[[1]]
+x[["measures"]]
+x$measures
+
+```
+
+```{r}
+x[[c(3,1)]] # Get the first element of the third element
+x[[3]][1]   # Get the first element of the third element
+```
+
+```{r}
+x[c(3,1)] #Get the third and the first elements
+```
+
+## Subsetting Data Frames
+
+```{r}
+x <- data.frame(measures = 1:3, cities=c("Rockville", "Gaithersburg", "Germantown"), 
+          statement=c(FALSE, TRUE, NA))
+
+x[[1]]
+x[["measures"]]
+x$measures
+```
+
+```{r}
+x[[c(3,1)]]
+x[[3]][1]
+```
+
+```{r}
+x[c(3,1)]
+```
+
+
+
+```{r}
+x <- data.frame(measures = 1:3, cities=c("Rockville", "Gaithersburg", "Germantown"), 
+          statement=c(FALSE, TRUE, NA))
+
+x[1, ]
+x[ ,3]
+x[ ,"cities"]
+```
+
+```{r}
+x[1:2, ]
+x[ ,2:3]
+```
+
+
+Remark: It happens many times that R converts character strings to factors.
+See the previous example
+
+You can prevent it as follows:
+
+```{r}
+x <- data.frame(measures = 1:3, cities=c("Rockville", "Gaithersburg", "Germantown"), 
+          statement=c(FALSE, TRUE, NA), stringsAsFactors=FALSE)
+
+x[ ,"cities"]
+class(x[ ,"cities"])
+```
+
+
+## Removing NA Values (Missing Values)
+
+A common task in data analysis is removing missing values (NAs).
+
+```{r}
+x <- c(1, 2, NA, 4, NA, 5) 
+bad <- is.na(x) 
+bad 
+```
+
+```{r}
+ x[!bad] 
+```
+
+What if there are multiple R objects and you want to take the subset with no missing values in any of those objects?
+
+```{r}
+x <- c(1, 2, NA, 4, NA, 5) 
+y <- c("a", "b", NA, "d", NA, "f") 
+good <- complete.cases(x, y) 
+good 
+```
+
+```{r}
+x[good] 
+y[good] 
+```
+
+
+```{r}
+data("airquality")  # data("airquality", package="datasets")
+head(airquality)
+dim(airquality)
+str(airquality)
+```
+
+```{r}
+ good <- complete.cases(airquality) 
+head(airquality[good,])
+```
+
+```{r}
+which(is.na(airquality$Ozone))
+sum(is.na(airquality$Ozone))
+```
+
+## Subsetting by Matching
+
+```{r}
+letters
+vowels <- c("a", "e", "i", "o", "u")
+
+letters %in% vowels
+which(letters %in% vowels)
+
+letters[which(letters %in% vowels)]
+```
+
+
+See the *R Programming for Data Science* , chapter:  "Subsetting R Objects" and
+also [*Advanced R*](http://adv-r.had.co.nz/Subsetting.html) 
+
+
+
+# Managing DataFrames with the dplyr package
+
+## What is Tidy Data
+
+From [*Tidy Data,  Wickham H (2014)*](https://www.jstatsoft.org/article/view/v059i10)
+
+- Tidy datasets are easy to manipulate, model and visualize, and have a specific structure: each variable is a column, each observation is a row, and each type of observational unit is a table.
+
+- A dataset is a collection of values, usually either numbers (if quantitative) or strings (if qualitative). Values are organized in two ways. Every value belongs to a variable and an observation. A variable contains all values that measure the same underlying attribute (like height, temperature, duration) across units. An observation contains all values measured on the same unit (like a person, or a day, or a race) across attributes.
+
+
+## Reshape
+
+See [*Reshape,  Wickham H (2007)*](https://www.jstatsoft.org/article/view/v021i12)
+
+Tidy data can be shaped in wide and long formats.
+
+- Wide format data have one observation in each row and a seperate column for each variable.
+- Wide data uses a column for each variable.
+
+- Long format data will have data in multiple rows,
+- Long format data have a column for variables names and another column for the values of the     variables.
+
+ We take a look at functions of the `reshape2` package.
+
+```{r}
+
+#library("datasets")
+#data(airquality, package="datasets")
+data(airquality)
+names(airquality)
+dim(airquality)
+```
+
+```{r}
+library("reshape2")
+library("dplyr")
+airquality <- tbl_df(airquality)
+class(airquality)
+```
+
+Let us check some of the records
+
+```{r}
+head(airquality)
+```
+
+```{r}
+tail(airquality)
+```
+
+ Now we use the `melt` function to change into long format
+
+```{r}
+long_data <- melt(airquality)
+head(long_data)
+```
+
+```{r}
+tail(long_data)
+```
+we did not specify Id-variable. Let use Month and Day as Id-variables.
+
+ID variables identify individual rows of data.
+ 
+
+```{r}
+long_data <- melt(airquality, id.vars = c("Month", "Day"))
+head(long_data)
+```
+
+```{r}
+tail(long_data)
+```
+
+Now we use `dcast` to change from long to wide format
+
+
+```{r}
+wide_data <- dcast(long_data, Month + Day ~ variable)
+head(wide_data)
+```
+
+```{r}
+tail(wide_data)
+```
+
+## The dplyr Package
+
+- The dplyr package was developed by Hadley Wickham of RStudio and is an optimized and distilled version of his plyr package.
+
+- Everything dplyr does could already be done with base R, but it greatly simplifies existing functionality in R. 
+
+## dplyr Grammar
+
+- Some of the key “verbs” provided by the dplyr package are
+
+• select: return a subset of the columns of a data frame, using a flexible notation 
+
+• filter: extract a subset of rows from a data frame based on logical conditions 
+
+• arrange: reorder rows of a data frame 
+
+• rename: rename variables in a data frame 
+
+• mutate: add new variables/columns or transform existing variables 
+
+• summarise / summarize: generate summary statistics of different variables in the data frame, possibly within strata 
+
+• %>%: the “pipe” operator is used to connect multiple verb actions together into a pipeline
+
+## All dplyr functions have the following properties:
+
+1. The first argument is a data frame. 
+
+2. The subsequent arguments describe what to do with the data frame specified in the first argument,and you can refer to columns in the data frame directly without using the $operator (just use the column names). 
+
+3. The return result of a function is a new data frame 
+
+4. Data frames must be tidy
+
+```{r}
+ install.packages("dplyr", repos = "http://cran.us.r-project.org")
+ library(dplyr)
+```
+
+[chicago Pollution](http://www.biostat.jhsph.edu/~rpeng/leanpub/rprog/chicago_data.zip)
+
+The dataset is airpollution and temperature data for the city of Chicago in the U.S
+```{r}
+chicago<-readRDS("chicago.rds")
+ dim(chicago) 
+ str(chicago)
+```
+ 
+## Select
+
+The select() function can be used to select columns of a data frame that you might need. 
+
+```{r}
+subset_1<-select(chicago, city:dptp) 
+head(subset_1)
+```
+
+Omit columns
+```{r}
+subset_2<-select(chicago, -(city:dptp))
+head(subset_2)
+```
+
+Variable names based on patterns
+```{r}
+subset_3 <- select(chicago, ends_with("2")) 
+head(subset_3)
+
+subset_4<- select(chicago, starts_with("d")) 
+str(subset_4)
+```
+
+## Filter
+
+The filter() function is used to extract subsets of rows from a data frame
+
+```{r}
+#  extract the rows of the chicago data frame where the levels of PM2.5 are greater than 30
+chic.f <- filter(chicago, pm25tmean2 > 30) 
+str(chic.f)
+
+summary(chic.f$pm25tmean2)
+```
+
+Extract the rows where PM2.5 is greater than 30 and temperature is greater than 80 degrees Fahrenheit.
+```{r}
+chic.f <- filter(chicago, pm25tmean2 > 30 & tmpd > 80) 
+select(chic.f, date, tmpd, pm25tmean2) 
+```
+
+
+## Arrange
+
+The arrange() function is used to reorder rows of a data frame according to one of the variables/columns. Reordering rows of a data frame (while preserving corresponding order of other columns) is normally a pain to do in R.
+
+```{r}
+   chicago <- arrange(chicago, date)
+```
+
+The first and last rows
+```{r}
+  head(select(chicago, date, pm25tmean2), 3) 
+  tail(select(chicago, date, pm25tmean2), 3) 
+```
+
+Descending order
+````{r}
+  chicago <- arrange(chicago, desc(date))
+   head(select(chicago, date, pm25tmean2), 3) 
+   tail(select(chicago, date, pm25tmean2), 3) 
+```
+
+## Rename
+
+Let us use the function rename() to change the names of variables.
+The column dptp stands for the dew point temperature and the pm25tmean2 column is for the PM2.5 data
+```{r}
+ head(chicago[, 1:5], 3) 
+  chicago <- rename(chicago, dewpoint = dptp, pm25 = pm25tmean2) 
+   head(chicago[, 1:5], 3) 
+```
+
+## Mutate
+
+The mutate() function computes transformations of variables in a data frame
+Let us create pm25detrend variable that subtracts the mean from the pm25 variable.
+
+```{r}
+chicago <- mutate(chicago, pm25detrend = pm25 - mean(pm25, na.rm = TRUE)) 
+head(chicago) 
+
+# There is also transmute() which drops all non-transformed variables. See the book.
+```
+
+## Group_by
+
+-The group_by() function is used to generate summary statistics from the data frame within strata defined by a variable
+
+-Suppose we want the average annual level of PM2.5. Then the stratum is the year and can be obtained from the date variable. 
+
+- The function summarize() is used with the group_by() function. 
+
+- We use the function as.POSIXlt() for date-time conversion and the function mutate() to create a variable for `year`
+
+```{r}
+  chicago <- mutate(chicago, year = as.POSIXlt(date)$year + 1900)
+
+# A new data frame that data frame that groups the original data frame by year
+
+ years <- group_by(chicago, year)
+ 
+
+```
+
+-Summary statistics for each year 
+```{r}
+ summarize(years, pm25 = mean(pm25, na.rm = TRUE),  o3 = max(o3tmean2, na.rm = TRUE), no2 = median(no2tmean2, na.rm = TRUE)) 
+```
+
+## %>%
+
+The pipeline operater %>% strings operations from left to right
+```{r}
+mutate(chicago, year = as.POSIXlt(date)$year + 1900)  %>% group_by(year) %>% summarize(pm25 = mean(pm25, na.rm = TRUE),  o3 = max(o3tmean2, na.rm = TRUE), no2 = median(no2tmean2, na.rm = TRUE)) 
+```
